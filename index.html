@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>(function(){try{var t=localStorage.getItem("diario:theme");if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Diário de Bordo Polo</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
 <style>
@@ -47,6 +48,8 @@ body::before {
   background: url('assets/fundo-bee-squad.jpeg') center/cover no-repeat;
   opacity: .10; z-index: -1; pointer-events: none;
 }
+:root[data-theme="dark"] body::before { opacity: .06; }
+:root[data-theme="dark"] img[alt="Bee Squad"] { filter: brightness(1.2) contrast(1.05); }
 body {
   background: var(--bg);
   color: var(--ink);
@@ -323,6 +326,9 @@ h2.sec small { font: 400 .75rem var(--font-mono); color: var(--ink-2); letter-sp
         <p class="eyebrow">Projeto Polo · visão da coordenação</p>
         <h1>Diário de Bordo</h1>
       </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="btnTheme" type="button" aria-label="Alternar tema claro/escuro">🌙</button>
     </div>
     <div class="top-actions" id="exportBar" hidden>
       <button class="btn" id="btnMd" type="button">Exportar conta (.md)</button>
@@ -1497,6 +1503,7 @@ h2.sec small { font: 400 .75rem var(--font-mono); color: var(--ink-2); letter-sp
   }
 
   /* ---------- wiring ---------- */
+  function updateThemeBtn() { var b = document.getElementById("btnTheme"); if (b) b.textContent = (document.documentElement.getAttribute("data-theme") === "dark") ? "☀️" : "🌙"; }
   function wire() {
     $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-tab]'); if (b) setTab(b.getAttribute('data-tab')); });
     $('#acct').addEventListener('change', function (e) { selectAccount(e.target.value); });
@@ -1563,7 +1570,14 @@ h2.sec small { font: 400 .75rem var(--font-mono); color: var(--ink-2); letter-sp
       b.addEventListener('click', function () { $('#tDue').value = addDays(Number(b.getAttribute('data-quick'))); });
     });
     $('#btnMd').addEventListener('click', exportMd);
-    $('#btnJson').addEventListener('click', exportJson);
+    1001 1001'#btnJson').addEventListener('click', exportJson);
+    var bt = document.querySelector("#btnTheme"); if (bt) bt.addEventListener("click", function () {
+      var cur = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('diario:theme', next); } catch (e) {}
+      updateThemeBtn();
+    });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) renderAll(); });
   }
   function currentRole() { var r = document.querySelector('input[name="prole"]:checked'); return r ? r.value : 'assessor'; }
@@ -1585,6 +1599,7 @@ h2.sec small { font: 400 .75rem var(--font-mono); color: var(--ink-2); letter-sp
     if (savedTab === 'visao' || savedTab === 'diario' || savedTab === 'equipe') state.tab = savedTab;
     Array.prototype.forEach.call(document.querySelectorAll('#tabs .tab'), function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === state.tab ? 'true' : 'false'); });
     wire(); applyType(); resetComposer();
+    updateThemeBtn();
     try { if (window.claude && window.claude.use) { db = await window.claude.use('db'); dl = await window.claude.use('downloads'); } } catch (e) { db = null; }
     try { if (window.claude && window.claude.use) ai = await window.claude.use('sample'); } catch (e) { ai = null; }
     applyType();
